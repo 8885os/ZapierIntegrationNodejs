@@ -4,7 +4,10 @@ import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
 import cors from 'cors'
+import axios from 'axios'
+import dotenv from 'dotenv'
 
+dotenv.config({ path: '.env.local' })
 const app = express()
 
 app.use(
@@ -45,10 +48,14 @@ app.post('/user/:id/data', (req, res) => {
 	}
 	users[id].data = data
 	// Trigger a webhook to Zapier
-	const zapierWebhookUrl = 'YOUR_ZAPIER_WEBHOOK_URL'
+	const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL
 	const zapierData = { id, data }
+	if (!zapierWebhookUrl || !isValidUrl(zapierWebhookUrl)) {
+		console.error('Invalid Zapier webhook URL:', zapierWebhookUrl)
+		res.status(500).json({ message: 'Invalid Zapier webhook URL' })
+		return
+	}
 	// Use a library like axios to send a POST request to the Zapier webhook
-	const axios = require('axios')
 	axios
 		.post(zapierWebhookUrl, zapierData)
 		.then(() => {
@@ -72,3 +79,12 @@ app.get('/user/:id/data', (req, res) => {
 		res.json(data)
 	}
 })
+
+function isValidUrl(url: string): boolean {
+	try {
+		new URL(url)
+		return true
+	} catch (error) {
+		return false
+	}
+}
