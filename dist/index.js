@@ -230,7 +230,6 @@ app.post('/user/:id/data', (req, res) => {
  *
  */
 app.get('/user/:id/data', (req, res) => {
-    console.log(req);
     const { id } = req.params;
     // Retrieve the data associated with the user
     const users = {
@@ -238,7 +237,6 @@ app.get('/user/:id/data', (req, res) => {
             data: { id: '0', name: 'Dummy Data', email: '9K5g8@example.com' },
         },
     };
-    console.log(users[id]);
     if (!users[id]) {
         res.status(404).json({ message: 'User not found' });
     }
